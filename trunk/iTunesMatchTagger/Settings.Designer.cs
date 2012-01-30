@@ -70,7 +70,16 @@ namespace iTunesMatchTagger {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Abgeglichene AAC-Audiodatei|Matched AAC audio file|Fichier audio AAC acheté|Gematcht AAC-audiobestand ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Abgeglichene AAC-Audiodatei
+        ///Matched AAC audio file
+        ///Fichier audio AAC mis en correspondance
+        ///Archivo de audio AAC coincidente
+        ///Arq. áudio AAC disponibilizado
+        ///Ficheiro de áudio AAC correspondente
+        ///Matchad AAC-ljudfil
+        ///Doc. audio AAC corrispondente
+        ///Gematcht AAC-audiobestand
+        ///一致した AAC オーディオファイル ähnelt.
         /// </summary>
         internal static string matchedKindAsString {
             get {

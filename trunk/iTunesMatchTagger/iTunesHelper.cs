@@ -20,18 +20,6 @@ namespace iTunesMatchTagger
         public bool UpdatePrimaryGenreName = true;
         public bool UpdateDiscCount = true;
         public bool UpdateDiscNumber = true;
-        /*
-        public string collectionViewUrl;
-        public string trackViewUrl;
-        public string previewUrl;
-        public string artworkUrl30;
-        public string artworkUrl60;
-        public string artworkUrl100;
-
-        public DateTime releaseDate;
-        public int trackTimeMillis;
-        public string country;
-            */
         #endregion
 
         public iTunesApp iTunes = new iTunesApp();
@@ -109,14 +97,21 @@ namespace iTunesMatchTagger
         {
             WriteLog("Update Track " + ((dynamic)track).Location, true, true);
 
-            if (UpdateTrackName) track.Name = tags.trackName;
-            if (UpdateCollectionName) track.Album = tags.collectionName;
-            if (UpdateArtistName) track.Artist = tags.artistName;
-            if (UpdateTrackCount) track.TrackCount = tags.trackCount;
-            if (UpdateTrackNumber) track.TrackNumber = tags.trackNumber;
-            if (UpdatePrimaryGenreName) track.Genre = tags.primaryGenreName;
-            if (UpdateDiscCount) track.DiscCount = tags.discCount;
-            if (UpdateDiscNumber) track.DiscNumber = tags.discNumber;
+            try
+            {
+                if (UpdateTrackName && tags.trackName != null) track.Name = tags.trackName;
+                if (UpdateCollectionName && tags.collectionName != null) track.Album = tags.collectionName;
+                if (UpdateArtistName && tags.artistName != null) track.Artist = tags.artistName;
+                if (UpdateTrackCount && tags.trackCount >= 0) track.TrackCount = tags.trackCount;
+                if (UpdateTrackNumber && tags.trackNumber >= 0) track.TrackNumber = tags.trackNumber;
+                if (UpdatePrimaryGenreName && tags.primaryGenreName != null) track.Genre = tags.primaryGenreName;
+                if (UpdateDiscCount && tags.discCount >= 0) track.DiscCount = tags.discCount;
+                if (UpdateDiscNumber && tags.discNumber >= 0) track.DiscNumber = tags.discNumber;
+            }
+            catch (Exception)
+            {
+                WriteLog("Error updating Track " + ((dynamic)track).Location);
+            }
         }
 
         /// <summary>

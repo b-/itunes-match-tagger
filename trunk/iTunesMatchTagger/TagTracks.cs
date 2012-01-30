@@ -91,6 +91,7 @@ namespace iTunesMatchTagger
             // update
             progressBar1.Value = 0;
             progressBar1.Maximum = tracks_found.Count;
+            progressBar1.Refresh();
 
             WriteLog("");
             WriteLog(tracks_found.Count + " tracks found");
@@ -116,9 +117,16 @@ namespace iTunesMatchTagger
 
                 foreach (IITTrack track in tracks)
                 {
-                    if (tracks_found.FirstOrDefault(t => ((dynamic)t.iTunesTrack).Location == ((dynamic)track).Location) == null)
+                    try
                     {
-                        WriteLog("> " + ((dynamic)track).Location);
+                        if (tracks_found.FirstOrDefault(t => ((dynamic)t.iTunesTrack).Location == ((dynamic)track).Location) == null)
+                        {
+                            WriteLog("> " + ((dynamic)track).Location);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteLog("Error: " + ex.Message, true, true);
                     }
                 }
             }
@@ -126,7 +134,6 @@ namespace iTunesMatchTagger
             Cursor.Current = Cursors.Default;
             MessageBox.Show("Update complete!");
         }
-
 
         protected void iTunesHelper_OniTunesLookup(IITTrack track, string country)
         {
@@ -145,6 +152,7 @@ namespace iTunesMatchTagger
 
             tbLog.SelectionStart = tbLog.Text.Length;
             tbLog.ScrollToCaret();
+            tbLog.Refresh();
         }
 
         public void ClearLog()
