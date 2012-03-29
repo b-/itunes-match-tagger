@@ -23,7 +23,7 @@ namespace iTunesMatchTagger
         #endregion
 
         public iTunesApp iTunes = new iTunesApp();
-        private WebClient _web_client = new WebClient();
+        private WebClient _web_client = new WebClient() { Encoding = Encoding.UTF8 }; // The search api under http://itunes.apple.com/lookup returns UTF8 encoded data.
         public static List<string> AllCountries = Settings.countries.Split(' ').ToList<string>();
         private static string MatchedKindAsString = Settings.matchedKindAsString;
         public List<string> SelectedCountries = new List<string>();
@@ -84,7 +84,8 @@ namespace iTunesMatchTagger
 
         public static string DecToHex(int decValue)
         {
-            return string.Format("{0:x}", decValue);
+            //return string.Format("{0:x}", decValue);
+            return string.Format("{0:x2}", decValue);
         }
         #endregion
 
