@@ -15,8 +15,11 @@ namespace iTunesMatchTagger
         {
             InitializeComponent();
 
-            linkLabel1.Links.Add(0, linkLabel1.Text.Length, linkLabel1.Text);
-            linkLabel2.Links.Add(0, linkLabel2.Text.Length, linkLabel2.Text);
+            LinkProjectUrl.Text = Settings.Default.ProjectUrl;
+            LinkAuthorMail.Text = "mailto:" + Settings.Default.AuthorEmail;
+
+            LinkProjectUrl.Links.Add(0, LinkProjectUrl.Text.Length, LinkProjectUrl.Text);
+            LinkAuthorMail.Links.Add(0, LinkAuthorMail.Text.Length, LinkAuthorMail.Text);
         }
 
         private void LinkClicked(object sender, System.Windows.Forms.LinkLabelLinkClickedEventArgs e)

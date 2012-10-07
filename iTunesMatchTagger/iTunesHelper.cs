@@ -1,212 +1,99 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using iTunesLib;
-using System.Configuration;
 using System.Net;
-using System.IO;
+using System.Collections.Specialized;
+using System.Runtime.Serialization;
 
 namespace iTunesMatchTagger
 {
     public class iTunesHelper
     {
-        #region UpdateOptions
-        public bool UpdateTrackName = true;
-        public bool UpdateCollectionName = true;
-        public bool UpdateArtistName = true;
-        public bool UpdateTrackCount = true;
-        public bool UpdateTrackNumber = true;
-        public bool UpdatePrimaryGenreName = true;
-        public bool UpdateDiscCount = true;
-        public bool UpdateDiscNumber = true;
-        #endregion
-
-        public iTunesApp iTunes = new iTunesApp();
         private WebClient _web_client = new WebClient() { Encoding = Encoding.UTF8 }; // The search api under http://itunes.apple.com/lookup returns UTF8 encoded data.
-        public static List<string> AllCountries = Settings.countries.Split(' ').ToList<string>();
-        private static string MatchedKindAsString = Settings.matchedKindAsString;
-        public List<string> SelectedCountries = new List<string>();
+
+        public static StringCollection StoreCountries = Settings.Default.StoreCountries;
 
         /// <summary>
-        /// check if any update flag is set to true
-        /// </summary>
-        /// <returns></returns>
-        public bool IsUpdateOptionSet()
-        {
-            return UpdateTrackName || UpdateCollectionName || UpdateArtistName ||
-                   UpdateTrackCount || UpdateTrackNumber || UpdatePrimaryGenreName ||
-                   UpdateDiscCount || UpdateDiscNumber;
-        }
-
-        /// <summary>
-        /// Opens Track-file and find iTunes-TrackId
+        /// lookup track on iTunes
         /// </summary>
         /// <param name="track"></param>
+        /// <param name="countries"></param>
         /// <returns></returns>
-        public static long GetTrackId(IITTrack track)
+        public iTunesLookupResult LookupTrack(Track track, StringCollection countries)
         {
-            try
+            foreach (var country in countries)
             {
-                string filename = ((dynamic)track).Location;
-
-                //WriteLog("Get TrackId for " + filename, true, true);
-
-                // only matched files
-                if (!MatchedKindAsString.Contains(track.KindAsString)) return 0;
-
-                byte[] byte_buffer = new byte[1024];
-                FileStream f = new FileStream(filename, FileMode.Open);
-                f.Read(byte_buffer, 0, 1024);
-                f.Close();
-                string file_string = ASCIIEncoding.ASCII.GetString(byte_buffer);
-                int pos = file_string.IndexOf("song");
-                string hex = DecToHex(byte_buffer[pos + 4]) + DecToHex(byte_buffer[pos + 5]) +
-                             DecToHex(byte_buffer[pos + 6]) + DecToHex(byte_buffer[pos + 7]);
-                long id = HexToDec(hex);
-
-                //WriteLog("iTunes-TrackId found: " + id, true, true);
-
-                return id;
-            }
-            catch(Exception ex)
-            {
-                //WriteLog("GetTrackId() failed: " + ex.Message, true, true);
-                return 0;
-            }
-        }
-
-        #region hex helper
-        public static Int32 HexToDec(string hexValue)
-        {
-            return Int32.Parse(hexValue, System.Globalization.NumberStyles.HexNumber);
-        }
-
-        public static string DecToHex(int decValue)
-        {
-            //return string.Format("{0:x}", decValue);
-            return string.Format("{0:x2}", decValue);
-        }
-        #endregion
-
-        /// <summary>
-        /// updates iTunes-Tags
-        /// </summary>
-        /// <param name="track"></param>
-        /// <param name="tags"></param>
-        public void UpdateTrack(IITTrack track, ID3Tags tags)
-        {
-            WriteLog("Update Track " + ((dynamic)track).Location, true, true);
-
-            try
-            {
-                if (UpdateTrackName && tags.trackName != null) track.Name = tags.trackName;
-                if (UpdateCollectionName && tags.collectionName != null) track.Album = tags.collectionName;
-                if (UpdateArtistName && tags.artistName != null) track.Artist = tags.artistName;
-                if (UpdateTrackCount && tags.trackCount >= 0) track.TrackCount = tags.trackCount;
-                if (UpdateTrackNumber && tags.trackNumber >= 0) track.TrackNumber = tags.trackNumber;
-                if (UpdatePrimaryGenreName && tags.primaryGenreName != null) track.Genre = tags.primaryGenreName;
-                if (UpdateDiscCount && tags.discCount >= 0) track.DiscCount = tags.discCount;
-                if (UpdateDiscNumber && tags.discNumber >= 0) track.DiscNumber = tags.discNumber;
-            }
-            catch (Exception)
-            {
-                WriteLog("Error updating Track " + ((dynamic)track).Location);
-            }
-        }
-
-        /// <summary>
-        /// Search track on iTunes
-        /// </summary>
-        /// <param name="tracks"></param>
-        /// <returns></returns>
-        public List<Track> FindTags(IITTrackCollection tracks)
-        {
-            List<Track> result = new List<Track>();
-            List<Track> track_list = new List<Track>();
-
-            foreach (IITTrack track in tracks)
-            {
-                Track t = new Track(track);
-                if (t.IsValid())
-                {
-                    WriteLog("TrackId: " + t.iTunesTrackId + " Filename: " + ((dynamic)track).Location, true, true);
-                    track_list.Add(t);
-                }
-            }
-
-            foreach(string country in SelectedCountries)
-            {
-                if (track_list.Count == 0) break;
-                result.AddRange(FindTags(track_list, country));
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Search track on iTunes
-        /// </summary>
-        /// <param name="tracks"></param>
-        /// <param name="country"></param>
-        /// <returns></returns>
-        public List<Track> FindTags(List<Track> tracks, string country)
-        {
-            WriteLog("Querying " + country + " store", true);
-
-            List<Track> result = new List<Track>();
-
-            foreach (Track track in tracks)
-            {
-                iTunesLookup(track.iTunesTrack, country);
-                if (track.Id3Tag != null) continue;
-
                 try
                 {
-                    // search on itunes
-                    string json = _web_client.DownloadString("http://itunes.apple.com/lookup?id=" + track.iTunesTrackId + "&country=" + country);
-                    var search_result = JsonHelper.Deserialise<iTunesResult>(json);
-                    if (search_result.resultCount == 1)
+                    iTunesLookupResult result = LookupTrack(track, country);
+                    if (result != null)
                     {
-                        track.Id3Tag = search_result.results[0];
-                        track.StoreCountry = country;
-                        result.Add(track);
-                    }
-                    else if (search_result.resultCount > 1)
-                    {
-                        throw new Exception(search_result.resultCount + " results found for " + ((dynamic)track).Location);
+                        iTunesLookup(track, result, country);
+                        return result;
                     }
                 }
                 catch (Exception ex)
                 {
-                    WriteLog("FindTags() Exception: " + ex.Message, true, true);
+                    Logging.WriteLog(this, "LookupTrack failed: " + ex.Message, Logging.Severity.Error);
                 }
             }
-
-            WriteLog(" - " + result.Count + " tracks found", false);
-
-            return result;
+            iTunesLookup(track, null, "");
+            return null;
         }
 
-        #region logging
-        public delegate void WriteLogEventHandler(string text, bool new_line = true, bool debug = false);
-
-        public event WriteLogEventHandler OnWriteLog;
-
-        protected void WriteLog(string text, bool new_line = true, bool debug = false)
+        /// <summary>
+        /// lookup track on iTunes
+        /// </summary>
+        /// <param name="track"></param>
+        /// <param name="country"></param>
+        /// <returns></returns>
+        public iTunesLookupResult LookupTrack(Track track, string country)
         {
-            if (OnWriteLog != null) OnWriteLog(text, new_line, debug);
+            string json = _web_client.DownloadString("http://itunes.apple.com/lookup?id=" + track.iTunesTrackId + "&country=" + country);
+            var search_result = JsonHelper.Deserialise<iTunesLookupResultCollection>(json);
+            if (search_result.resultCount == 0)
+            {
+                return null;
+            }
+            if (search_result.resultCount > 1)
+            {
+                Logging.WriteLog(this, search_result.resultCount + " results found for " + track.Filename, Logging.Severity.Debug);
+            }
+
+            return search_result.results[0];
         }
-        #endregion
+
+        [DataContractAttribute]
+        private class iTunesLookupResultCollection
+        {
+            [DataMemberAttribute]
+            public int resultCount;
+            [DataMemberAttribute]
+            public iTunesLookupResult[] results;
+        }
 
         #region lookup event
-        public delegate void iTunesLookupEventHandler(IITTrack track, string country);
+        public delegate void iTunesLookupEventHandler(object sender, iTunesLookupEventArgs args);
 
         public event iTunesLookupEventHandler OniTunesLookup;
 
-        protected void iTunesLookup(IITTrack track, string country)
+        public class iTunesLookupEventArgs : EventArgs
         {
-            if (OniTunesLookup != null) OniTunesLookup(track, country);
+            public Track Track;
+            public string Country;
+            public iTunesLookupResult LookupResult;
+
+            public iTunesLookupEventArgs(Track track, iTunesLookupResult lookupResult, string country)
+            {
+                Track = track;
+                Country = country;
+                LookupResult = lookupResult;
+            }
+        }
+
+        private void iTunesLookup(Track track, iTunesLookupResult lookupResult, string country)
+        {
+            if (OniTunesLookup != null) OniTunesLookup(this, new iTunesLookupEventArgs(track, lookupResult, country));
         }
         #endregion
     }

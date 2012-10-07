@@ -30,9 +30,9 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.btnClose = new System.Windows.Forms.Button();
-            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.LinkProjectUrl = new System.Windows.Forms.LinkLabel();
             this.label2 = new System.Windows.Forms.Label();
-            this.linkLabel2 = new System.Windows.Forms.LinkLabel();
+            this.LinkAuthorMail = new System.Windows.Forms.LinkLabel();
             this.SuspendLayout();
             // 
             // label1
@@ -42,8 +42,8 @@
             this.label1.Size = new System.Drawing.Size(240, 70);
             this.label1.TabIndex = 0;
             this.label1.Text = "Legal notice:\r\niTunes is a trademark of Apple Inc.\r\niTunes Match Tagger is an ind" +
-                "ependent application and has not been authorized, sponsored, or otherwise approv" +
-                "ed by Apple Inc.";
+    "ependent application and has not been authorized, sponsored, or otherwise approv" +
+    "ed by Apple Inc.";
             // 
             // btnClose
             // 
@@ -56,16 +56,16 @@
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
-            // linkLabel1
+            // LinkProjectUrl
             // 
-            this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(4, 39);
-            this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.Size = new System.Drawing.Size(229, 13);
-            this.linkLabel1.TabIndex = 11;
-            this.linkLabel1.TabStop = true;
-            this.linkLabel1.Text = "http://code.google.com/p/itunes-match-tagger";
-            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkClicked);
+            this.LinkProjectUrl.AutoSize = true;
+            this.LinkProjectUrl.Location = new System.Drawing.Point(4, 39);
+            this.LinkProjectUrl.Name = "LinkProjectUrl";
+            this.LinkProjectUrl.Size = new System.Drawing.Size(53, 13);
+            this.LinkProjectUrl.TabIndex = 11;
+            this.LinkProjectUrl.TabStop = true;
+            this.LinkProjectUrl.Text = "ProjectUrl";
+            this.LinkProjectUrl.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkClicked);
             // 
             // label2
             // 
@@ -76,17 +76,17 @@
             this.label2.TabIndex = 12;
             this.label2.Text = "iTunes Match Tagger by Martin Pietschmann\r\n";
             // 
-            // linkLabel2
+            // LinkAuthorMail
             // 
-            this.linkLabel2.AutoSize = true;
-            this.linkLabel2.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
-            this.linkLabel2.Location = new System.Drawing.Point(4, 24);
-            this.linkLabel2.Name = "linkLabel2";
-            this.linkLabel2.Size = new System.Drawing.Size(161, 13);
-            this.linkLabel2.TabIndex = 13;
-            this.linkLabel2.TabStop = true;
-            this.linkLabel2.Text = "mailto:schirkan@googlemail.com";
-            this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkClicked);
+            this.LinkAuthorMail.AutoSize = true;
+            this.LinkAuthorMail.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
+            this.LinkAuthorMail.Location = new System.Drawing.Point(4, 24);
+            this.LinkAuthorMail.Name = "LinkAuthorMail";
+            this.LinkAuthorMail.Size = new System.Drawing.Size(57, 13);
+            this.LinkAuthorMail.TabIndex = 13;
+            this.LinkAuthorMail.TabStop = true;
+            this.LinkAuthorMail.Text = "AuthorMail";
+            this.LinkAuthorMail.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkClicked);
             // 
             // Info
             // 
@@ -95,9 +95,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnClose;
             this.ClientSize = new System.Drawing.Size(238, 170);
-            this.Controls.Add(this.linkLabel2);
+            this.Controls.Add(this.LinkAuthorMail);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.linkLabel1);
+            this.Controls.Add(this.LinkProjectUrl);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -117,8 +117,8 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnClose;
-        private System.Windows.Forms.LinkLabel linkLabel1;
+        private System.Windows.Forms.LinkLabel LinkProjectUrl;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.LinkLabel linkLabel2;
+        private System.Windows.Forms.LinkLabel LinkAuthorMail;
     }
 }
